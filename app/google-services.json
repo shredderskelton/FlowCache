@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "852450177512",
+    "project_id": "flowcache-8615f",
+    "storage_bucket": "flowcache-8615f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:852450177512:android:a84ad4c9006844508cb45d",
+        "android_client_info": {
+          "package_name": "com.skelton.flowcache"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "852450177512-9p3duljmm4u7s9umajhemfvas6qi6k6p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA8x6DRwd_YTf5Oan7fVes3_8C-WezJxAc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "852450177512-9p3duljmm4u7s9umajhemfvas6qi6k6p.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
