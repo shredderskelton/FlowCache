@@ -5,32 +5,35 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.tasks.await
 
 interface AccountDataSource {
-    suspend fun getAccountDetails(): Result<AccountDetails>
+    suspend fun getAccountDetails(name: String): Result<AccountDetails>
+    suspend fun createAccount(name: String, details: AccountDetails): Result<Unit>
 }
 
-class DefaultAccountDataSource(private val collectionProvider: FirestoreCollectionProvider) :
-    AccountDataSource {
-    override suspend fun getAccountDetails(): Result<AccountDetails> {
+class DefaultAccountDataSource(
+    private val collectionProvider: FirestoreCollectionProvider,
+    private val config: AppConfig
+) : AccountDataSource {
 
-        delay(5000)
+    override suspend fun getAccountDetails(name: String): Result<AccountDetails> {
+
+        delay(config.simulatedNetworkDelay.toMillis())
+
         return try {
-            val account =
-                collectionProvider.accounts.document("nick").get().await()
-                    .toObject<AccountDetails>()!!
-
-            println("Got a result")
-
-            Result.Success.Network(
-                // AccountDetails(
-                //     "Nick Skelton",
-                //     "nick.g.skelton@gmail.com",
-                //     "Redhorn Pl 32, 43234 Munich"
-                // )
-                account
-            )
+            collectionProvider.accounts.document(name).get().await()
+                .toObject<AccountDetails>()?.let { Result.Success.Network(it) }
+                ?: Result.Error("Account for [$name] not found", Result.Error.Code.NotFound)
         } catch (ex: Exception) {
-            println("Error")
+            println(ex)
             Result.Error(ex.localizedMessage)
         }
     }
+
+    override suspend fun createAccount(name: String, details: AccountDetails): Result<Unit> =
+        try {
+            collectionProvider.accounts.document(name).set(details).await()
+            Result.Success.Network(Unit)
+        } catch (ex: Exception) {
+            println(ex)
+            Result.Error(ex.localizedMessage)
+        }
 }

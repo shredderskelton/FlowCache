@@ -2,13 +2,14 @@ package com.skelton.flowcache
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.flatMapConcat
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import java.time.Duration
 
 interface AccountRepository {
-    val accountDetails: Flow<Result<AccountDetails>>
-    fun refresh()
+    fun getAccount(name: String, force: Boolean = false): Flow<Result<AccountDetails>>
+    val isLoading: Flow<Boolean>
+    suspend fun createAccount(name: String, details: AccountDetails): Result<Unit>
 }
 
 class InMemoryAccountRepository(
@@ -16,46 +17,33 @@ class InMemoryAccountRepository(
     private val dataSource: AccountDataSource
 ) : AccountRepository {
 
-    private val refreshTrigger = MutableStateFlow(0L)
+    override val isLoading = MutableStateFlow(false)
 
-    override val accountDetails = createFlow("Account") { dataSource.getAccountDetails() }
-
-    override fun refresh() {
-        refreshTrigger.value++
+    override fun getAccount(name: String, force: Boolean): Flow<Result<AccountDetails>> {
+        if (force) cache.clearAll()
+        return cache.createCachedFlow(
+            key = "Account/$name",
+            policy = CachePolicy(
+                CachePolicy.Timeout.MaxAge(Duration.ofMinutes(2)),
+                CachePolicy.ErrorFilter.Notify {
+                    it.errorCode == Result.Error.Code.NotFound
+                }
+            )
+        ) { dataSource.getAccountDetails(name) }
+            .onStart { isLoading.value = true }
+            .onEach { isLoading.value = false }
     }
 
-    // Assumes the caching rules:
-    // - One minute cache
-    // - If there is a cache hit, emit the hit,
-    //   and emit again if the network result is successful.
-    // - If we have a cache hit, emit the hit, and ignore any errors that come afterward.
-    //
-    //   This is a little dangerous and different errors should be handled differently.
-    //   Eg. This is ok if there was a Network failure (connection problem) but maybe not
-    //   if there was a certain API error (eg. user has been deleted/banned/blocked)
-    private inline fun <reified T : Any> createFlow(
-        key: String,
-        crossinline block: suspend () -> Result<T>,
-    ): Flow<Result<T>> =
-        refreshTrigger.flatMapConcat {
-            flow {
-                var cacheHit = false
-                cache.get<T>(key)?.let {
-                    cacheHit = true
-                    println("Cache hit for $key!")
-                    emit(Result.Success.Cached(it))
-                }
-                when (val result = block()) {
-                    is Result.Success -> {
-                        cache.set(key, result.data, Duration.ofMinutes(5))
-                        emit(result)
-                    }
-                    is Result.Error -> {
-                        // If we emitted a cached result, then don't send an error too
-                        if (!cacheHit) emit(result)
-                    }
-                }
-            }
+    override suspend fun createAccount(name: String, details: AccountDetails): Result<Unit> {
+        val result = dataSource.createAccount(name, details)
+        // Write operation on cache
+        if (result is Result.Success) {
+            cache.set(
+                "Account/$name",
+                result.data,
+                CachePolicy.Timeout.MaxAge(Duration.ofMinutes(1))
+            )
         }
+        return result
+    }
 }
-

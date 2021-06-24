@@ -1,12 +1,11 @@
 package com.skelton.flowcache
 
+import android.content.Intent
 import android.os.Bundle
-import android.view.View
-import android.widget.Button
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
+import com.skelton.flowcache.databinding.ActivityMainBinding
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -14,45 +13,62 @@ import kotlinx.coroutines.flow.onEach
 class MainActivity : AppCompatActivity() {
 
     private val viewModel: MainViewModel by lazy {
+        val config = AppConfig()
         DefaultMainViewModel(
             InMemoryAccountRepository(
                 DataCacheMemory(
                     TimeProviderImpl()
                 ),
                 DefaultAccountDataSource(
-                    DefaultFirestoreCollectionProvider()
+                    DefaultFirestoreCollectionProvider(),
+                    config
                 )
-            )
+            ),
+            config
         )
     }
 
+    private lateinit var binding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        findViewById<Button>(R.id.refreshButton).setOnClickListener {
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
+        binding.refreshButton.setOnClickListener {
             viewModel.refresh()
+        }
+        binding.createButton.setOnClickListener {
+            startActivity(Intent(this, CreateActivity::class.java))
+        }
+        binding.swipeToRefreshView.setOnRefreshListener {
+            viewModel.refresh(true)
         }
         viewModel.bind()
     }
 
     private fun MainViewModel.bind() {
         bind(name) {
-            findViewById<TextView>(R.id.nameEditText).text = it
+            binding.nameEditText.setText(it)
         }
         bind(address) {
-            findViewById<TextView>(R.id.addressEditText).text = it
+            binding.addressEditText.setText(it)
         }
         bind(email) {
-            findViewById<TextView>(R.id.emailEditText).text = it
+            binding.emailEditText.setText(it)
         }
         bind(cacheNoteVisible) {
-            findViewById<View>(R.id.cacheWarning).isVisible = it
+            binding.cacheWarning.isVisible = it
         }
         bind(errorVisible) {
-            findViewById<View>(R.id.errorWarning).isVisible = it
+            binding.errorWarning.isVisible = it
         }
         bind(errorText) {
-            findViewById<TextView>(R.id.errorWarning).text = it
+            binding.errorWarning.text = it
+        }
+        bind(loadingVisible) {
+            binding.progressBar.isVisible = it
+            if (!it) binding.swipeToRefreshView.isRefreshing = false
         }
     }
 }
