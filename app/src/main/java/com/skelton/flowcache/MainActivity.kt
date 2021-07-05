@@ -16,6 +16,7 @@ class MainActivity : AppCompatActivity() {
         val config = AppConfig()
         DefaultMainViewModel(
             InMemoryAccountRepository(
+                // DataCacheNoOp,
                 DataCacheMemory(
                     TimeProviderImpl()
                 ),

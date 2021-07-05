@@ -2,6 +2,7 @@ package com.skelton.flowcache
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import java.time.Duration
@@ -24,7 +25,7 @@ class InMemoryAccountRepository(
         return cache.createCachedFlow(
             key = "Account/$name",
             policy = CachePolicy(
-                CachePolicy.Timeout.MaxAge(Duration.ofMinutes(2)),
+                CachePolicy.Timeout.MaxAge(Duration.ofMinutes(20)),
                 CachePolicy.ErrorFilter.Notify {
                     it.errorCode == Result.Error.Code.NotFound
                 }
@@ -45,5 +46,21 @@ class InMemoryAccountRepository(
             )
         }
         return result
+    }
+}
+
+
+class DefaultAccountRepository(
+    private val dataSource: AccountDataSource
+) : AccountRepository {
+    override val isLoading = MutableStateFlow(false)
+
+    override fun getAccount(name: String, force: Boolean): Flow<Result<AccountDetails>> =
+        flow { emit(dataSource.getAccountDetails(name)) }
+            .onStart { isLoading.value = true }
+            .onEach { isLoading.value = false }
+
+    override suspend fun createAccount(name: String, details: AccountDetails): Result<Unit> {
+        TODO("Not yet implemented")
     }
 }
