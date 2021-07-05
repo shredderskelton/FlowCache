@@ -1,5 +1,6 @@
-package com.skelton.flowcache
+package com.skelton.flowcache.cache
 
+import com.skelton.flowcache.DataResult
 import kotlinx.coroutines.flow.flow
 
 interface DataCache {
@@ -12,7 +13,7 @@ interface DataCache {
 inline fun <reified T : Any> DataCache.createCachedFlow(
     key: String,
     policy: CachePolicy,
-    crossinline block: suspend () -> Result<T>,
+    crossinline block: suspend () -> DataResult<T>,
 ) = flow {
     var cacheHit = false
 
@@ -21,19 +22,19 @@ inline fun <reified T : Any> DataCache.createCachedFlow(
     if (cachedResult != null) {
         println("$key Cache hit")
         cacheHit = true
-        emit(Result.Success.Cache(cachedResult))
+        emit(DataResult.Success.Cache(cachedResult))
     } else {
         println("$key Cache miss")
     }
 
     // Then go to the source, in this case the "Network"
     when (val result = block()) {
-        is Result.Success -> {
+        is DataResult.Success -> {
             println("$key Success from Network, storing in Cache and emitting")
             set(key, result.data, policy.time)
             emit(result)
         }
-        is Result.Error -> {
+        is DataResult.Error -> {
             // If we emitted a cached result, then we need to decide whether
             // to follow up with an error as well.
             if (!cacheHit) {

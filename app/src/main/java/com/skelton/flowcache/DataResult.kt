@@ -1,7 +1,7 @@
 package com.skelton.flowcache
 
-sealed class Result<out T : Any> {
-    sealed class Success<T : Any> : Result<T>() {
+sealed class DataResult<out T : Any> {
+    sealed class Success<T : Any> : DataResult<T>() {
         abstract val data: T
 
         data class Cache<T : Any>(override val data: T) : Success<T>()
@@ -11,7 +11,7 @@ sealed class Result<out T : Any> {
     data class Error(
         val errorMessage: String,
         val errorCode: Code = Code.None
-    ) : Result<Nothing>() {
+    ) : DataResult<Nothing>() {
         enum class Code {
             NotFound, NotAuthorized, Blocked, None
         }

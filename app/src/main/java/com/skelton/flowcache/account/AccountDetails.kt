@@ -1,4 +1,4 @@
-package com.skelton.flowcache
+package com.skelton.flowcache.account
 
 data class AccountDetails(
     val name: String = "",

@@ -1,5 +1,11 @@
-package com.skelton.flowcache
+package com.skelton.flowcache.account
 
+import com.skelton.flowcache.DataResult
+import com.skelton.flowcache.account.AccountDataSource
+import com.skelton.flowcache.account.AccountDetails
+import com.skelton.flowcache.cache.CachePolicy
+import com.skelton.flowcache.cache.DataCache
+import com.skelton.flowcache.cache.createCachedFlow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
@@ -8,9 +14,9 @@ import kotlinx.coroutines.flow.onStart
 import java.time.Duration
 
 interface AccountRepository {
-    fun getAccount(name: String, force: Boolean = false): Flow<Result<AccountDetails>>
+    fun getAccount(name: String, force: Boolean = false): Flow<DataResult<AccountDetails>>
     val isLoading: Flow<Boolean>
-    suspend fun createAccount(name: String, details: AccountDetails): Result<Unit>
+    suspend fun createAccount(name: String, details: AccountDetails): DataResult<Unit>
 }
 
 class InMemoryAccountRepository(
@@ -20,14 +26,14 @@ class InMemoryAccountRepository(
 
     override val isLoading = MutableStateFlow(false)
 
-    override fun getAccount(name: String, force: Boolean): Flow<Result<AccountDetails>> {
+    override fun getAccount(name: String, force: Boolean): Flow<DataResult<AccountDetails>> {
         if (force) cache.clearAll()
         return cache.createCachedFlow(
             key = "Account/$name",
             policy = CachePolicy(
                 CachePolicy.Timeout.MaxAge(Duration.ofMinutes(20)),
                 CachePolicy.ErrorFilter.Notify {
-                    it.errorCode == Result.Error.Code.NotFound
+                    it.errorCode == DataResult.Error.Code.NotFound
                 }
             )
         ) { dataSource.getAccountDetails(name) }
@@ -35,10 +41,10 @@ class InMemoryAccountRepository(
             .onEach { isLoading.value = false }
     }
 
-    override suspend fun createAccount(name: String, details: AccountDetails): Result<Unit> {
+    override suspend fun createAccount(name: String, details: AccountDetails): DataResult<Unit> {
         val result = dataSource.createAccount(name, details)
         // Write operation on cache
-        if (result is Result.Success) {
+        if (result is DataResult.Success) {
             cache.set(
                 "Account/$name",
                 result.data,

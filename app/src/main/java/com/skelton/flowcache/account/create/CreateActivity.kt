@@ -1,8 +1,11 @@
-package com.skelton.flowcache
+package com.skelton.flowcache.account.create
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.skelton.flowcache.AppConfig
+import com.skelton.flowcache.account.DefaultAccountDataSource
 import com.skelton.flowcache.databinding.ActivityCreateBinding
+import com.skelton.flowcache.system.DefaultFirestoreCollectionProvider
 
 class CreateActivity : AppCompatActivity() {
 

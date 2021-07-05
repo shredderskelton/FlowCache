@@ -1,20 +1,26 @@
-package com.skelton.flowcache
+package com.skelton.flowcache.account
 
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
+import com.skelton.flowcache.AppConfig
+import com.skelton.flowcache.account.create.CreateActivity
+import com.skelton.flowcache.cache.DataCacheMemory
 import com.skelton.flowcache.databinding.ActivityMainBinding
+import com.skelton.flowcache.system.DefaultFirestoreCollectionProvider
+import com.skelton.flowcache.system.TimeProviderImpl
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
-class MainActivity : AppCompatActivity() {
 
-    private val viewModel: MainViewModel by lazy {
+class AccountActivity : AppCompatActivity() {
+
+    private val viewModel: AccountViewModel by lazy {
         val config = AppConfig()
-        DefaultMainViewModel(
+        DefaultAccountViewModel(
             InMemoryAccountRepository(
                 // DataCacheNoOp,
                 DataCacheMemory(
@@ -48,7 +54,7 @@ class MainActivity : AppCompatActivity() {
         viewModel.bind()
     }
 
-    private fun MainViewModel.bind() {
+    private fun AccountViewModel.bind() {
         bind(name) {
             binding.nameEditText.setText(it)
         }

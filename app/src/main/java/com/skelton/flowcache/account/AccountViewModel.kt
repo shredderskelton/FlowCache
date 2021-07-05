@@ -1,7 +1,11 @@
-package com.skelton.flowcache
+package com.skelton.flowcache.account
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.skelton.flowcache.AppConfig
+import com.skelton.flowcache.DataResult
+import com.skelton.flowcache.account.AccountDetails
+import com.skelton.flowcache.account.AccountRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,7 +16,7 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.shareIn
 import kotlin.random.Random
 
-abstract class MainViewModel : ViewModel() {
+abstract class AccountViewModel : ViewModel() {
     abstract val name: Flow<String>
     abstract val email: Flow<String>
     abstract val address: Flow<String>
@@ -23,10 +27,10 @@ abstract class MainViewModel : ViewModel() {
     abstract fun refresh(force: Boolean = false)
 }
 
-class DefaultMainViewModel(
+class DefaultAccountViewModel(
     private val repository: AccountRepository,
     private val config: AppConfig
-) : MainViewModel() {
+) : AccountViewModel() {
 
     private val refreshTrigger = MutableStateFlow(RefreshParameters())
 
@@ -43,19 +47,19 @@ class DefaultMainViewModel(
     override val address = accountResult.mapSuccess { it.address }
     override val loadingVisible = repository.isLoading
 
-    private fun Flow<Result<AccountDetails>>.mapSuccess(block: (AccountDetails) -> String) = map {
+    private fun Flow<DataResult<AccountDetails>>.mapSuccess(block: (AccountDetails) -> String) = map {
         when (it) {
-            is Result.Success -> block(it.data)
-            is Result.Error -> "N/A"
+            is DataResult.Success -> block(it.data)
+            is DataResult.Error -> "N/A"
         }
     }
 
     override val cacheNoteVisible = accountResult
         .map {
             when (it) {
-                is Result.Success.Network -> false
-                is Result.Success.Cache -> true
-                is Result.Error -> false
+                is DataResult.Success.Network -> false
+                is DataResult.Success.Cache -> true
+                is DataResult.Error -> false
             }
         }
         .mapLatest {
@@ -65,15 +69,15 @@ class DefaultMainViewModel(
 
     override val errorVisible = accountResult.map {
         when (it) {
-            is Result.Success -> false
-            is Result.Error -> true
+            is DataResult.Success -> false
+            is DataResult.Error -> true
         }
     }
 
     override val errorText = accountResult.map {
         when (it) {
-            is Result.Success -> ""
-            is Result.Error -> it.errorMessage
+            is DataResult.Success -> ""
+            is DataResult.Error -> it.errorMessage
         }
     }
 

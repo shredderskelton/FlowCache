@@ -1,5 +1,6 @@
-package com.skelton.flowcache
+package com.skelton.flowcache.cache
 
+import com.skelton.flowcache.DataResult
 import java.time.Duration
 import java.time.Instant
 
@@ -11,7 +12,7 @@ data class CachePolicy(
     sealed class ErrorFilter {
         object None : ErrorFilter()
         object All : ErrorFilter()
-        class Notify(val notifyOn: (Result.Error) -> Boolean) : ErrorFilter()
+        class Notify(val notifyOn: (DataResult.Error) -> Boolean) : ErrorFilter()
     }
 
     sealed class Timeout {
@@ -22,7 +23,7 @@ data class CachePolicy(
     }
 }
 
-fun Result.Error.shouldNotify(filter: CachePolicy.ErrorFilter) = when (filter) {
+fun DataResult.Error.shouldNotify(filter: CachePolicy.ErrorFilter) = when (filter) {
     is CachePolicy.ErrorFilter.Notify -> filter.notifyOn(this)
     CachePolicy.ErrorFilter.All -> true
     CachePolicy.ErrorFilter.None -> false

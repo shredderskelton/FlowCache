@@ -1,7 +1,9 @@
-package com.skelton.flowcache
+package com.skelton.flowcache.account.create
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.skelton.flowcache.account.AccountDataSource
+import com.skelton.flowcache.account.AccountDetails
 import kotlinx.coroutines.launch
 
 abstract class CreateViewModel : ViewModel() {
