@@ -61,12 +61,12 @@ class DefaultAccountRepository(
 ) : AccountRepository {
     override val isLoading = MutableStateFlow(false)
 
-    override fun getAccount(name: String, force: Boolean): Flow<Result<AccountDetails>> =
+    override fun getAccount(name: String, force: Boolean): Flow<DataResult<AccountDetails>> =
         flow { emit(dataSource.getAccountDetails(name)) }
             .onStart { isLoading.value = true }
             .onEach { isLoading.value = false }
 
-    override suspend fun createAccount(name: String, details: AccountDetails): Result<Unit> {
+    override suspend fun createAccount(name: String, details: AccountDetails): DataResult<Unit> {
         TODO("Not yet implemented")
     }
 }
