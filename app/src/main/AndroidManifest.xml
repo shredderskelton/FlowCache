@@ -3,6 +3,7 @@
     package="com.skelton.flowcache">
 
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -11,14 +12,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FlowCache">
-        <activity android:name=".account.AccountActivity">
+        <activity android:name=".account.AccountActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".account.create.CreateActivity" />
+        <activity android:name=".account.create.CreateActivity" android:exported="true" />
     </application>
 
 </manifest>
