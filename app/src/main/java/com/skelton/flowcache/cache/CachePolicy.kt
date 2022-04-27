@@ -24,7 +24,7 @@ data class CachePolicy(
 }
 
 fun DataResult.Error.shouldNotify(filter: CachePolicy.ErrorFilter) = when (filter) {
-    is CachePolicy.ErrorFilter.Notify -> filter.notifyOn(this)
     CachePolicy.ErrorFilter.All -> true
     CachePolicy.ErrorFilter.None -> false
+    is CachePolicy.ErrorFilter.Notify -> filter.notifyOn(this)
 }

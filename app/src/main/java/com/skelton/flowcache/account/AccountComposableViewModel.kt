@@ -54,11 +54,11 @@ class DefaultComposableAccountViewModel(
     override fun reset() {
         viewModelScope.launch {
             repository.createAccount(
-                "nick",
-                AccountDetails(
-                    "Nick Skelton",
-                    "nick.g.skelton@gmail.com",
-                    "22 Grünwaldstr. \n81436 München"
+                name = "nick",
+                details = AccountDetails(
+                    name = "Nick Skelton",
+                    email = "nick.g.skelton@gmail.com",
+                    address = "22 Grünwaldstr. \n81436 München"
                 )
             )
             refresh(true)
@@ -66,7 +66,7 @@ class DefaultComposableAccountViewModel(
     }
 }
 
-data class RefreshParameters(val force: Boolean = false, val accountName: String = "nick")
+class RefreshParameters(val force: Boolean = false, val accountName: String = "nick")
 
 sealed class AccountState {
     object Loading : AccountState()
