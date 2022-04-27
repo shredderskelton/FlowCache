@@ -15,7 +15,6 @@ import java.time.Duration
 
 interface AccountRepository {
     fun getAccount(name: String, force: Boolean = false): Flow<DataResult<AccountDetails>>
-    val isLoading: Flow<Boolean>
     suspend fun createAccount(name: String, details: AccountDetails): DataResult<Unit>
 }
 
@@ -24,21 +23,17 @@ class InMemoryAccountRepository(
     private val dataSource: AccountDataSource
 ) : AccountRepository {
 
-    override val isLoading = MutableStateFlow(false)
-
     override fun getAccount(name: String, force: Boolean): Flow<DataResult<AccountDetails>> {
         if (force) cache.clearAll()
         return cache.createCachedFlow(
             key = "Account/$name",
             policy = CachePolicy(
-                CachePolicy.Timeout.MaxAge(Duration.ofMinutes(20)),
-                CachePolicy.ErrorFilter.Notify {
+                time = CachePolicy.Timeout.MaxAge(Duration.ofMinutes(20)),
+                errorFilter = CachePolicy.ErrorFilter.Notify {
                     it.errorCode == DataResult.Error.Code.NotFound
                 }
             )
         ) { dataSource.getAccountDetails(name) }
-            .onStart { isLoading.value = true }
-            .onEach { isLoading.value = false }
     }
 
     override suspend fun createAccount(name: String, details: AccountDetails): DataResult<Unit> {
@@ -55,18 +50,3 @@ class InMemoryAccountRepository(
     }
 }
 
-
-class DefaultAccountRepository(
-    private val dataSource: AccountDataSource
-) : AccountRepository {
-    override val isLoading = MutableStateFlow(false)
-
-    override fun getAccount(name: String, force: Boolean): Flow<DataResult<AccountDetails>> =
-        flow { emit(dataSource.getAccountDetails(name)) }
-            .onStart { isLoading.value = true }
-            .onEach { isLoading.value = false }
-
-    override suspend fun createAccount(name: String, details: AccountDetails): DataResult<Unit> {
-        TODO("Not yet implemented")
-    }
-}

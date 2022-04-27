@@ -12,14 +12,24 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FlowCache">
-        <activity android:name=".account.AccountActivity" android:exported="true">
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:label="@string/title_activity_main"
+            android:theme="@style/Theme.FlowCache">
+        </activity>
+        <activity
+            android:name=".account.AccountComposableActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".account.create.CreateActivity" android:exported="true" />
+        <activity
+            android:name=".account.create.CreateActivity"
+            android:exported="true" />
     </application>
 
 </manifest>
