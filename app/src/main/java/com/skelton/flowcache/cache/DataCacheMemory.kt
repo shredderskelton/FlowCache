@@ -39,7 +39,7 @@ class DataCacheMemory(private val timeProvider: TimeProvider) : DataCache {
                 Duration.between(timeProvider.now(), timeout.time)
             }
             CachePolicy.Timeout.Always -> Duration.ZERO
-            CachePolicy.Timeout.Never -> Duration.ofDays(Long.MAX_VALUE)
+            CachePolicy.Timeout.Never -> ChronoUnit.FOREVER.duration
         }
         val entry = CacheEntry(value, timeProvider.now() + expiryDuration)
         key.log("Setting cache Entry: $entry")
