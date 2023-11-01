@@ -60,7 +60,9 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.4.1")
 
-    implementation("com.google.firebase:firebase-firestore-ktx:24.9.1")
+    implementation(platform("com.google.firebase:firebase-bom:32.5.0"))
+    implementation("com.google.firebase:firebase-firestore-ktx")
+    implementation("com.google.firebase:firebase-auth")
 
     val lifecycle = "2.6.2"
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle")
@@ -74,8 +76,9 @@ dependencies {
     implementation(platform("androidx.compose:compose-bom:2023.03.00"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
-    implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.ui:ui-tooling-preview")
+    debugImplementation("androidx.compose.ui:ui-tooling")
 
 //    implementation "androidx.compose.ui:ui:$compose_version"
 //    implementation "androidx.compose.ui:ui-tooling:$compose_version"

@@ -1,4 +1,4 @@
-package com.skelton.flowcache.account
+package com.skelton.flowcache
 
 import android.content.Intent
 import android.os.Bundle
@@ -7,24 +7,28 @@ import androidx.activity.compose.setContent
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import com.skelton.flowcache.AppConfig
+import com.skelton.flowcache.account.AccountDataSourceRest
+import com.skelton.flowcache.account.AccountRepositoryInMemory
+import com.skelton.flowcache.account.AccountView
+import com.skelton.flowcache.account.AccountViewModel
+import com.skelton.flowcache.account.AccountViewModelDefault
+import com.skelton.flowcache.account.AccountViewState
 import com.skelton.flowcache.account.create.CreateActivity
 import com.skelton.flowcache.cache.DataCacheMemory
+import com.skelton.flowcache.system.HttpProviderDefault
 import com.skelton.flowcache.system.TimeProviderImpl
 import com.skelton.flowcache.ui.theme.FlowCacheTheme
 
-class AccountComposableActivity : ComponentActivity() {
+class MainActivity : ComponentActivity() {
 
-    private val viewModel: AccountComposableViewModel by lazy {
+    private val viewModel: AccountViewModel by lazy {
         val config = AppConfig()
-        DefaultComposableAccountViewModel(
-            repository = InMemoryAccountRepository(
+        AccountViewModelDefault(
+            repository = AccountRepositoryInMemory(
                 // cache =DataCacheNoOp,
                 cache = DataCacheMemory(
                     TimeProviderImpl()
@@ -47,19 +51,23 @@ class AccountComposableActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     Column(modifier = Modifier.animateContentSize()) {
-                        AccountComposable(
+                        AccountView(
                             state = viewModel.state.collectAsState(
-                                initial = AccountState.Error("")
+                                initial = AccountViewState.Error("")
                             ),
                             onRefresh = { viewModel.refresh(it) },
-                            onReset = { viewModel.reset() }
+                            onReset = { viewModel.reset() },
+                            onCreate = {
+
+                                val myIntent = Intent(
+                                    this@MainActivity,
+                                    CreateActivity::class.java
+                                )
+                                startActivity(myIntent)
+
+                            }
                         )
-                        Button(onClick = {
-                            val myIntent = Intent(this@AccountComposableActivity, CreateActivity::class.java)
-                            startActivity(myIntent)
-                        }) {
-                            Text("Create")
-                        }
+
                     }
                 }
             }

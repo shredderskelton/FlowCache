@@ -20,10 +20,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.skelton.flowcache.AppConfig
-import com.skelton.flowcache.account.AccountDataSourceFirebase
 import com.skelton.flowcache.account.AccountDataSourceRest
-import com.skelton.flowcache.account.HttpProviderDefault
-import com.skelton.flowcache.system.DefaultFirestoreCollectionProvider
+import com.skelton.flowcache.system.HttpProviderDefault
 import com.skelton.flowcache.ui.theme.FlowCacheTheme
 import kotlinx.parcelize.Parcelize
 
@@ -89,16 +87,19 @@ class CreateActivity : ComponentActivity() {
                             value = userData.value.address,
                             onValueChange = { userData.getAndUpdate { copy(address = it) } },
                             label = { Text("Address") })
-                        Button(onClick = {
-                            with(userData.value) {
-                                viewModel.create(
-                                    id = id,
-                                    name = name,
-                                    email = email,
-                                    address = address,
-                                )
-                            }
-                        }) {
+                        val buttonMod = Modifier.weight(1F)
+                        Button(
+                            modifier = buttonMod.padding(end = 6.dp),
+                            onClick = {
+                                with(userData.value) {
+                                    viewModel.create(
+                                        id = id,
+                                        name = name,
+                                        email = email,
+                                        address = address,
+                                    )
+                                }
+                            }) {
                             Text("Create")
                         }
                     }
