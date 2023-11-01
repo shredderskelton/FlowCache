@@ -1,18 +1,46 @@
 package com.skelton.flowcache
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import com.skelton.flowcache.account.AccountDataSourceRest
+import com.skelton.flowcache.account.AccountRepositoryInMemory
+import com.skelton.flowcache.account.AccountView
+import com.skelton.flowcache.account.AccountViewModel
+import com.skelton.flowcache.account.AccountViewModelDefault
+import com.skelton.flowcache.account.AccountViewState
+import com.skelton.flowcache.account.create.CreateActivity
+import com.skelton.flowcache.cache.DataCacheMemory
+import com.skelton.flowcache.system.HttpProviderDefault
+import com.skelton.flowcache.system.TimeProviderImpl
 import com.skelton.flowcache.ui.theme.FlowCacheTheme
 
 class MainActivity : ComponentActivity() {
+
+    private val viewModel: AccountViewModel by lazy {
+        val config = AppConfig()
+        AccountViewModelDefault(
+            repository = AccountRepositoryInMemory(
+                // cache =DataCacheNoOp,
+                cache = DataCacheMemory(
+                    TimeProviderImpl()
+                ),
+                dataSource = AccountDataSourceRest(
+                    HttpProviderDefault,
+                )
+            ),
+            config = config
+        )
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -20,24 +48,30 @@ class MainActivity : ComponentActivity() {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
+                    color = MaterialTheme.colorScheme.background
                 ) {
-                    Greeting("Android")
+                    Column(modifier = Modifier.animateContentSize()) {
+                        AccountView(
+                            state = viewModel.state.collectAsState(
+                                initial = AccountViewState.Error("")
+                            ),
+                            onRefresh = { viewModel.refresh(it) },
+                            onReset = { viewModel.reset() },
+                            onCreate = {
+
+                                val myIntent = Intent(
+                                    this@MainActivity,
+                                    CreateActivity::class.java
+                                )
+                                startActivity(myIntent)
+
+                            }
+                        )
+
+                    }
                 }
             }
         }
     }
-}
 
-@Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    FlowCacheTheme {
-        Greeting("Android")
-    }
 }
