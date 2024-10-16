@@ -25,7 +25,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.3"
+        kotlinCompilerExtensionVersion = "1.5.13"
     }
     kotlinOptions {
         freeCompilerArgs += "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api"
@@ -35,6 +35,7 @@ android {
 //        freeCompilerArgs += '-opt-in=androidx.compose.animation.ExperimentalAnimationApi'
 //        useIR = true
 //        allWarningsAsErrors = true
+        jvmTarget = "17"
     }
     buildFeatures {
         compose = true
@@ -54,26 +55,26 @@ android {
 }
 
 dependencies {
-    val kotlinVersion = "1.8.10"
+    val kotlinVersion = "1.9.23"
     implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.4.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.9.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.5.1")
 
-    implementation(platform("com.google.firebase:firebase-bom:32.5.0"))
+    implementation(platform("com.google.firebase:firebase-bom:33.4.0"))
     implementation("com.google.firebase:firebase-firestore-ktx")
     implementation("com.google.firebase:firebase-auth")
 
-    val lifecycle = "2.6.2"
+    val lifecycle = "2.8.6"
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle")
     implementation("androidx.lifecycle:lifecycle-common-java8:$lifecycle")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle")
 //    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.4.1"
 
-    implementation("androidx.core:core-ktx:1.12.0")
-    implementation("androidx.activity:activity-compose:1.8.0")
+    implementation("androidx.core:core-ktx:1.13.1")
+    implementation("androidx.activity:activity-compose:1.9.3")
 
-    implementation(platform("androidx.compose:compose-bom:2023.03.00"))
+    implementation(platform("androidx.compose:compose-bom:2024.10.00"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.material3:material3")

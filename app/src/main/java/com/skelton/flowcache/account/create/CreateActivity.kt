@@ -48,10 +48,12 @@ class CreateActivity : ComponentActivity() {
             FlowCacheTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(4.dp),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Column(modifier = Modifier.animateContentSize()) {
+                    Column() {
                         val userData: MutableState<UserData> = rememberSaveable {
                             mutableStateOf(
                                 UserData(
@@ -89,7 +91,9 @@ class CreateActivity : ComponentActivity() {
                             label = { Text("Address") })
                         val buttonMod = Modifier.weight(1F)
                         Button(
-                            modifier = buttonMod.padding(end = 6.dp),
+                            modifier = buttonMod
+                                .fillMaxWidth()
+                                .padding(end = 6.dp),
                             onClick = {
                                 with(userData.value) {
                                     viewModel.create(

@@ -62,7 +62,7 @@ suspend inline fun <reified T> HttpClient.request(block: HttpRequestBuilder.() -
     delay(AppConfig().simulatedNetworkDelay.toMillis())
     return try {
         val response: HttpResponse = request(requestBuilder)
-        if (response.contentLength() ?: 0 < 10) { // null
+        if ((response.contentLength() ?: 0) < 10) { // null
             DataResult.Error("Not Found", DataResult.Error.Code.NotFound)
         } else if (response.status.value in 200..299) {
             val content: T = response.body<T>()
