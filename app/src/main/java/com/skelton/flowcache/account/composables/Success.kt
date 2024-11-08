@@ -9,7 +9,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.skelton.flowcache.account.AccountData
+import com.skelton.flowcache.account.AccountEntity
 import com.skelton.flowcache.account.AccountView
 import com.skelton.flowcache.account.AccountViewState
 import com.skelton.flowcache.ui.theme.FlowCacheTheme
@@ -51,7 +51,7 @@ fun SuccessPreview() {
         AccountView(
             rememberUpdatedState(
                 AccountViewState.Success(
-                    AccountData(
+                    AccountEntity(
                         name = "Nick Skelton",
                         email = "nick.g.skelton@gmail.com",
                         address = "22 Acacia Ave",

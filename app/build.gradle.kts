@@ -81,6 +81,10 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     debugImplementation("androidx.compose.ui:ui-tooling")
 
+    val koin_version="4.0.0"
+    implementation(project.dependencies.platform("io.insert-koin:koin-bom:$koin_version"))
+    implementation("io.insert-koin:koin-core")
+    implementation("io.insert-koin:koin-compose-viewmodel")
 //    implementation "androidx.compose.ui:ui:$compose_version"
 //    implementation "androidx.compose.ui:ui-tooling:$compose_version"
 //    implementation "androidx.compose.foundation:foundation:$compose_version"

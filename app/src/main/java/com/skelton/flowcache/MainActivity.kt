@@ -11,8 +11,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import com.skelton.flowcache.account.AccountDataSourceRest
-import com.skelton.flowcache.account.AccountRepositoryInMemory
+import com.skelton.flowcache.account.AccountApiCached
+import com.skelton.flowcache.account.AccountApiRest
+import com.skelton.flowcache.account.AccountUseCaseInMemory
 import com.skelton.flowcache.account.AccountView
 import com.skelton.flowcache.account.AccountViewModel
 import com.skelton.flowcache.account.AccountViewModelDefault
@@ -20,7 +21,6 @@ import com.skelton.flowcache.account.AccountViewState
 import com.skelton.flowcache.account.create.CreateActivity
 import com.skelton.flowcache.cache.DataCacheMemory
 import com.skelton.flowcache.system.HttpProviderDefault
-import com.skelton.flowcache.system.TimeProviderImpl
 import com.skelton.flowcache.ui.theme.FlowCacheTheme
 
 class MainActivity : ComponentActivity() {
@@ -28,13 +28,14 @@ class MainActivity : ComponentActivity() {
     private val viewModel: AccountViewModel by lazy {
         val config = AppConfig()
         AccountViewModelDefault(
-            repository = AccountRepositoryInMemory(
+            accountUseCase = AccountUseCaseInMemory(
                 // cache =DataCacheNoOp,
-                cache = DataCacheMemory(
-                    TimeProviderImpl()
-                ),
-                dataSource = AccountDataSourceRest(
-                    HttpProviderDefault,
+                cache = DataCacheMemory(),
+                api = AccountApiCached(
+                    cache = DataCacheMemory(),
+                    realDataSource = AccountApiRest(
+                        HttpProviderDefault,
+                    )
                 )
             ),
             config = config

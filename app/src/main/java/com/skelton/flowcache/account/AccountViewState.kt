@@ -8,7 +8,7 @@ sealed class AccountViewState {
     ) : AccountViewState()
 
     data class Success(
-        val data: AccountData,
+        val data: AccountEntity,
         val isBackgroundRefreshing: Boolean = false,
         val isCachedNoteVisible: Boolean = false,
     ) : AccountViewState()

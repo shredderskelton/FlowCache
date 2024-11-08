@@ -4,9 +4,7 @@ import android.os.Bundle
 import android.os.Parcelable
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
@@ -20,8 +18,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.skelton.flowcache.AppConfig
-import com.skelton.flowcache.account.AccountDataSourceRest
+import com.skelton.flowcache.account.AccountApiCached
+import com.skelton.flowcache.account.AccountApiRest
+import com.skelton.flowcache.cache.DataCacheMemory
 import com.skelton.flowcache.system.HttpProviderDefault
+import com.skelton.flowcache.system.TimeProviderImpl
 import com.skelton.flowcache.ui.theme.FlowCacheTheme
 import kotlinx.parcelize.Parcelize
 
@@ -30,8 +31,11 @@ class CreateActivity : ComponentActivity() {
     private val viewModel: CreateViewModel by lazy {
         val config = AppConfig()
         DefaultCreateViewModel(
-            AccountDataSourceRest(
-                HttpProviderDefault
+            AccountApiCached(
+                DataCacheMemory(TimeProviderImpl()),
+                AccountApiRest(
+                    HttpProviderDefault
+                )
             )
         )
     }

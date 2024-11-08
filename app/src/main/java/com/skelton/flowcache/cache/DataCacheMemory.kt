@@ -1,6 +1,7 @@
 package com.skelton.flowcache.cache
 
 import com.skelton.flowcache.system.TimeProvider
+import com.skelton.flowcache.system.TimeProviderImpl
 import java.time.Duration
 
 /**
@@ -8,7 +9,7 @@ import java.time.Duration
  *
  * No persistence
  */
-class DataCacheMemory(private val timeProvider: TimeProvider) : DataCache {
+class DataCacheMemory(private val timeProvider: TimeProvider = TimeProviderImpl()) : DataCache {
 
     private val cache = mutableMapOf<String, CacheEntry>()
 

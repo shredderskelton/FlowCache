@@ -7,19 +7,19 @@ import io.ktor.client.request.setBody
 import io.ktor.http.HttpMethod
 import io.ktor.http.encodedPath
 
-class AccountDataSourceRest(
+class AccountApiRest(
     private val httpProvider: HttpProvider
-) : AccountDataSource {
+) : AccountApi {
     private fun buildUrl(id: String) = "/users/${id.lowercase()}.json"
-    override suspend fun getAccountDetails(id: String): DataResult<AccountData> =
-        httpProvider().request<AccountData> {
+    override suspend fun getAccountDetails(id: String): DataResult<AccountEntity> =
+        httpProvider().request<AccountEntity> {
             method = HttpMethod.Get
             url {
                 encodedPath = buildUrl(id)
             }
         }
 
-    override suspend fun createAccount(id: String, details: AccountData): DataResult<Unit> =
+    override suspend fun createAccount(id: String, details: AccountEntity): DataResult<Unit> =
         httpProvider().request<Unit> {
             method = HttpMethod.Put
             url {

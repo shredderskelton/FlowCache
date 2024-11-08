@@ -89,7 +89,7 @@ fun SuccessPreview() {
         AccountView(
             rememberUpdatedState(
                 AccountViewState.Success(
-                    AccountData(
+                    AccountEntity(
                         name = "Nick Skelton",
                         email = "nick.g.skelton@gmail.com",
                         address = "22 Acacia Ave",

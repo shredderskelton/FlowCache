@@ -1,7 +1,10 @@
 package com.skelton.flowcache.cache
 
 import com.skelton.flowcache.DataResult
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 interface DataCache {
     suspend fun <T : Any> get(key: String): T?
@@ -14,7 +17,7 @@ inline fun <reified T : Any> DataCache.createCachedFlow(
     key: String,
     policy: CachePolicy,
     crossinline block: suspend () -> DataResult<T>,
-) = flow {
+): Flow<DataResult<T>> = flow {
     var cacheHit = false
 
     // 1. Check the Cache
@@ -30,6 +33,7 @@ inline fun <reified T : Any> DataCache.createCachedFlow(
             set(key, result.data, policy.time)
             emit(result)
         }
+
         is DataResult.Error ->
             if (!cacheHit || result.shouldNotify(policy.errorFilter))
                 emit(result)

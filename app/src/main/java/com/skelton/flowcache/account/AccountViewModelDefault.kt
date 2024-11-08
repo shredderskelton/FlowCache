@@ -13,16 +13,16 @@ import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
 
 class AccountViewModelDefault(
-    private val repository: AccountRepository,
+    private val accountUseCase: AccountUseCase,
     private val config: AppConfig
 ) : AccountViewModel() {
 
     private val refreshTrigger = MutableStateFlow(RefreshParameters())
 
-    val _state: Flow<AccountViewState> =
+    private val _state: Flow<AccountViewState> =
         refreshTrigger
             .flatMapLatest { parameters ->
-                repository.getAccount(
+                accountUseCase.get(
                     name = parameters.accountName,
                     force = parameters.force
                 ).transformLatest {
@@ -47,7 +47,7 @@ class AccountViewModelDefault(
     }
 
     override val state: Flow<AccountViewState> =
-        combine(_state, repository.isRefreshing) { s, refreshing ->
+        combine(_state, accountUseCase.isRefreshing) { s, refreshing ->
             when (s) {
                 is AccountViewState.Error -> s.copy(isBackgroundRefreshing = refreshing)
                 AccountViewState.Loading -> s
@@ -57,9 +57,9 @@ class AccountViewModelDefault(
 
     override fun reset() {
         viewModelScope.launch {
-            repository.createAccount(
+            accountUseCase.create(
                 name = "nick",
-                details = AccountData(
+                details = AccountEntity(
                     name = "Nick Skelton",
                     email = "nick.g.skelton@gmail.com",
                     address = "22 Grünwaldstr. \n81436 München"

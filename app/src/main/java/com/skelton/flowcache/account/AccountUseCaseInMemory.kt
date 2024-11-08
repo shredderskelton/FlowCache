@@ -8,13 +8,14 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.time.Duration
 
-class AccountRepositoryInMemory(
+class AccountUseCaseInMemory(
     private val cache: DataCache,
-    private val dataSource: AccountDataSource
-) : AccountRepository {
+    private val api: AccountApi
+) : AccountUseCase {
 
     override val isRefreshing = MutableStateFlow(false)
-    override fun getAccount(name: String, force: Boolean): Flow<DataResult<AccountData>> {
+
+    override fun get(name: String, force: Boolean): Flow<DataResult<AccountEntity>> {
         if (force) cache.clearAll()
         return cache.createCachedFlow(
             key = "Account/$name",
@@ -26,14 +27,14 @@ class AccountRepositoryInMemory(
             )
         ) {
             isRefreshing.value = true
-            dataSource.getAccountDetails(name).also {
+            api.getAccountDetails(name).also {
                 isRefreshing.value = false
             }
         }
     }
 
-    override suspend fun createAccount(name: String, details: AccountData): DataResult<Unit> {
-        val result = dataSource.createAccount(name, details)
+    override suspend fun create(name: String, details: AccountEntity): DataResult<Unit> {
+        val result = api.createAccount(name, details)
         // Write operation on cache
         if (result is DataResult.Success) {
             cache.set(
